@@ -16,5 +16,5 @@ class ItemModel(BaseModel):
     name: Mapped[str] = mapped_column(String(255))
     description: Mapped[str] = mapped_column(String(5000))
     category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
-    category: Mapped["CategoryModel"] = relationship()
+    category: Mapped["CategoryModel"] = relationship(lazy="raise")
     creator_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
