@@ -15,6 +15,8 @@ class Config(BaseSettings):
     MYSQL_DEV_DATABASE: str
     MYSQL_DEV_PORT: int = 3306
     ADMINER_PORT: int = 8080
+    JWT_LIFETIME: int = 31536000
+    JWT_SECRET: str
 
     model_config = SettingsConfigDict(
         case_sensitive=True,

@@ -1,4 +1,7 @@
-from pydantic import BaseModel, ConfigDict
+from typing import Annotated
+
+import annotated_types
+from pydantic import BaseModel, ConfigDict, StrictStr
 
 
 class BaseResponseSchema(BaseModel):
@@ -13,3 +16,7 @@ class BaseValidationSchema(BaseModel):
         frozen=True,
         str_strip_whitespace=True,
     )
+
+
+NonEmptyStr = Annotated[StrictStr, annotated_types.MinLen(1)]
+ShortStr = Annotated[NonEmptyStr, annotated_types.MaxLen(255)]
