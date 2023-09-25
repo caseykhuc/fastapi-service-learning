@@ -1,6 +1,6 @@
 import pytest
 
-from ..helpers import create_user
+from main.engines.users import add_user
 
 
 async def test_sign_up_successfully(client):
@@ -33,7 +33,7 @@ async def test_sign_up_unsuccessfully_with_validation_error(client, payload):
 async def test_sign_up_unsuccessfully_with_existing_email(client):
     email = "email@gmail.com"
     password = "test_password"
-    await create_user(email=email, password=password)
+    await add_user(email=email, password=password)
 
     response = await client.post(
         "/register",
@@ -45,7 +45,7 @@ async def test_sign_up_unsuccessfully_with_existing_email(client):
 async def test_login_succesfully(client):
     email = "email@gmail.com"
     password = "test_password"
-    await create_user(email=email, password=password)
+    await add_user(email=email, password=password)
 
     response = await client.post(
         "/login",
@@ -73,7 +73,7 @@ async def test_login_unsuccessfully_with_validation_error(client, payload):
 async def test_login_unsuccessfully_with_unmatched_credentials(client):
     email = "email@gmail.com"
     password = "test_password"
-    await create_user(email=email, password=password)
+    await add_user(email=email, password=password)
 
     response = await client.post(
         "/login",

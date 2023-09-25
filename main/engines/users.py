@@ -27,8 +27,8 @@ async def get_user_by_email(email: str) -> UserModel:
     return result.scalar()
 
 
-def verify_user(user: UserModel, password: str):
+def verify_password(password: str, hashed_password: str):
     return bcrypt.checkpw(
         password=password.encode(),
-        hashed_password=user.hashed_password.encode(),
+        hashed_password=hashed_password.encode(),
     )

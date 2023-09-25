@@ -3,7 +3,7 @@ from sqlalchemy.exc import IntegrityError
 
 from main.commons import exceptions
 from main.commons.exceptions import ErrorCode, ErrorMessage, Unauthorized
-from main.engines.users import add_user, get_user_by_email, verify_user
+from main.engines.users import add_user, get_user_by_email, verify_password
 from main.schemas.authentication import AccessTokenSchema, LoginSchema, SignUpSchema
 from main.utils import auth
 
@@ -14,7 +14,7 @@ router: APIRouter = APIRouter()
 async def _add_user(user: SignUpSchema):
     try:
         user = await add_user(email=user.email, password=user.password)
-        return {"access_token": auth.create_access_token_from_id(user.id)}
+        return AccessTokenSchema(access_token=auth.create_access_token_from_id(user.id))
     except IntegrityError:
         raise exceptions.BadRequest(
             error_message=ErrorMessage.ACCOUNT_ALREADY_REGISTERED,
@@ -26,8 +26,9 @@ async def _add_user(user: SignUpSchema):
 async def _authenticate_user(user_data: LoginSchema):
     user = await get_user_by_email(user_data.email)
 
-    if user:
-        if verify_user(user, user_data.password):
-            return {"access_token": auth.create_access_token_from_id(user.id)}
+    if user and verify_password(user_data.password, user.hashed_password):
+        return AccessTokenSchema(
+            access_token=auth.create_access_token_from_id(user.id),
+        )
 
     raise Unauthorized(error_message=ErrorMessage.INVALID_LOGIN_CREDENTIALS)

@@ -15,7 +15,6 @@ def create_access_token_from_id(
             "sub": account_id,
             "iat": iat,
             "exp": iat + datetime.timedelta(seconds=config.JWT_LIFETIME),
-            "fresh": True,
         },
         config.JWT_SECRET,
     )
