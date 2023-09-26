@@ -21,7 +21,7 @@ async def add_user(email: str, password: str) -> UserModel:
 
 
 async def get_user_by_email(email: str) -> UserModel:
-    statement = select(UserModel).filter(UserModel.email == email)
+    statement = select(UserModel).where(UserModel.email == email)
     result = await db.session.execute(statement)
 
     return result.scalar()
