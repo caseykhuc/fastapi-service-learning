@@ -15,6 +15,9 @@ class StatusCode:
 class ErrorCode:
     BAD_REQUEST = 400000
     VALIDATION_ERROR = 400001
+    CATEGORY_NAME_EXISTS = 400002
+    ACCOUNT_ALREADY_REGISTERED = 400003
+
     UNAUTHORIZED = 401000
     FORBIDDEN = 403000
     NOT_FOUND = 404000
@@ -62,7 +65,7 @@ class BaseError(Exception):
 
     def to_response(self):
         return JSONResponse(
-            ErrorSchema().from_orm(self).dict(),
+            ErrorSchema().model_validate(self).model_dump(),
             self.status_code,
         )
 
@@ -101,3 +104,8 @@ class InternalServerError(BaseError):
     status_code = StatusCode.INTERNAL_SERVER_ERROR
     error_message = _ErrorMessage.INTERNAL_SERVER_ERROR
     error_code = ErrorCode.INTERNAL_SERVER_ERROR
+
+
+class ErrorMessage:
+    ACCOUNT_ALREADY_REGISTERED = "Your email is already registered. Please log in."
+    INVALID_LOGIN_CREDENTIALS = "Your login information is incorrect. Please try again."

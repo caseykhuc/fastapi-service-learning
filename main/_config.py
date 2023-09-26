@@ -11,10 +11,13 @@ class Config(BaseSettings):
     SQLALCHEMY_DATABASE_URI: str
     SQLALCHEMY_ENGINE_OPTIONS: dict = {}
     SQLALCHEMY_ECHO: bool = False
+    JWT_LIFETIME: int = 31536000
+    JWT_SECRET: str
 
     model_config = SettingsConfigDict(
         case_sensitive=True,
         env_file_encoding="utf-8",
+        extra="ignore",
     )
 
 
