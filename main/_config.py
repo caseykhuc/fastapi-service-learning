@@ -11,16 +11,13 @@ class Config(BaseSettings):
     SQLALCHEMY_DATABASE_URI: str
     SQLALCHEMY_ENGINE_OPTIONS: dict = {}
     SQLALCHEMY_ECHO: bool = False
-    MYSQL_DEV_ROOT_PASSWORD: str
-    MYSQL_DEV_DATABASE: str
-    MYSQL_DEV_PORT: int = 3306
-    ADMINER_PORT: int = 8080
     JWT_LIFETIME: int = 31536000
     JWT_SECRET: str
 
     model_config = SettingsConfigDict(
         case_sensitive=True,
         env_file_encoding="utf-8",
+        extra="ignore",
     )
 
 
