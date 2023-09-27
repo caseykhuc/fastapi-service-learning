@@ -16,7 +16,9 @@ class ItemModel(BaseModel):
     name: Mapped[str] = mapped_column(String(255), unique=True)
     description: Mapped[str] = mapped_column(String(5000))
 
-    category_id: Mapped[int] = mapped_column(ForeignKey("category.id"))
+    category_id: Mapped[int] = mapped_column(
+        ForeignKey("category.id", ondelete="CASCADE"),
+    )
     category: Mapped["CategoryModel"] = relationship(
         back_populates="items",
         lazy="raise",
