@@ -16,5 +16,7 @@ class CategoryModel(BaseModel):
     name: Mapped[str] = mapped_column(String(255), unique=True)
     creator_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     items: Mapped[list["ItemModel"]] = relationship(
+        back_populates="category",
         lazy="raise",
+        cascade="all, delete",
     )
