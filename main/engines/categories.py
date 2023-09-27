@@ -1,37 +1,15 @@
 from collections.abc import Sequence
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, select
 from sqlalchemy.exc import SQLAlchemyError
 
 from main import db
 from main.commons.exceptions import BadRequest
 from main.models.category import CategoryModel
-from main.models.item import ItemModel
 
 
 async def get_categories() -> Sequence[CategoryModel]:
     statement = select(CategoryModel)
-    result = await db.session.execute(statement)
-    return result.scalars().all()
-
-
-async def get_count_items(category_id: int) -> int | None:
-    statement = (
-        select(func.count("*"))
-        .select_from(ItemModel)
-        .where(ItemModel.category_id == category_id)
-    )
-    result = await db.session.execute(statement)
-    return result.scalar()
-
-
-async def get_items(category_id: int, offset: int, limit: int) -> Sequence[ItemModel]:
-    statement = (
-        select(ItemModel)
-        .where(ItemModel.category_id == category_id)
-        .offset(offset)
-        .limit(limit)
-    )
     result = await db.session.execute(statement)
     return result.scalars().all()
 
