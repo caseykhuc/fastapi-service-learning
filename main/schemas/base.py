@@ -20,3 +20,7 @@ class BaseValidationSchema(BaseModel):
 
 NonEmptyStr = Annotated[StrictStr, annotated_types.MinLen(1)]
 ShortStr = Annotated[NonEmptyStr, annotated_types.MaxLen(255)]
+
+
+class Empty(BaseModel):
+    model_config = ConfigDict(extra="forbid")
