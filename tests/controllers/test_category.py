@@ -9,26 +9,38 @@ mock_email = "email@gmail.com"
 mock_password = "random_string"
 
 
+def prepare_user(email: str = mock_email, password: str = mock_password):
+    return add_user(email=email, password=password)
+
+
+def prepare_category(user: UserModel):
+    return add_category(name="Cat 1", creator_id=user.id)
+
+
+async def get_access_token(client, user: UserModel):
+    return (
+        (
+            await client.post(
+                "/login",
+                json={"email": user.email, "password": mock_password},
+            )
+        ).json()
+    )["access_token"]
+
+
 @pytest.fixture
 async def user():
-    yield await add_user(email=mock_email, password=mock_password)
+    return await prepare_user(email=mock_email, password=mock_password)
 
 
 @pytest.fixture
 async def category(user: UserModel):
-    yield await add_category(name="Cat 1", creator_id=user.id)
+    return await prepare_category(user)
 
 
 @pytest.fixture
 async def access_token(client, user: UserModel):
-    yield (
-        (
-            await client.post(
-                "/login",
-                json={"email": mock_email, "password": mock_password},
-            )
-        ).json()
-    )["access_token"]
+    return await get_access_token(client=client, user=user)
 
 
 class TestGetCategories:
@@ -161,3 +173,17 @@ class TestDeleteCategory:
             f"/categories/{category.id}",
         )
         assert response.status_code == 401
+
+    async def test_delete_category_unsuccessfully_not_creator(
+        self,
+        client,
+        category: CategoryModel,
+    ):
+        user_2 = await prepare_user(email="email2@gmail.com", password=mock_password)
+        access_token_2 = await get_access_token(client, user=user_2)
+
+        response = await client.delete(
+            f"/categories/{category.id}",
+            headers={"Authorization": f"Bearer {access_token_2}"},
+        )
+        assert response.status_code == 403

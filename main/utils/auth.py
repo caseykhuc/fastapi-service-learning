@@ -7,7 +7,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import DecodeError
 
 from main import config
-from main.commons.exceptions import ErrorCode, ErrorMessage, Forbidden, Unauthorized
+from main.commons.exceptions import Unauthorized
 
 
 def create_access_token_from_id(
@@ -50,14 +50,3 @@ async def require_authentication(
         raise Unauthorized()
 
     return user_id
-
-
-async def require_creator(
-    required_id: int,
-    id: Annotated[int, Depends(require_authentication)],
-):
-    if required_id != id:
-        raise Forbidden(
-            error_message=ErrorMessage.NOT_CREATOR,
-            error_code=ErrorCode.NOT_CREATOR,
-        )
