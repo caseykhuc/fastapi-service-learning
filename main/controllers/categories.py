@@ -11,7 +11,11 @@ from main.engines.categories import (
 from main.schemas.base import Empty
 from main.schemas.category import CategoryCreatePayloadSchema, CategorySchema
 from main.utils.auth import require_authentication
-from main.utils.category import get_category_or_404, require_category_creator
+from main.utils.category import (
+    get_category_or_404,
+    require_category_creator,
+    validate_category_name,
+)
 
 router: APIRouter = APIRouter()
 
@@ -33,6 +37,7 @@ async def _add_category(
     category: CategoryCreatePayloadSchema,
     user_id: Annotated[int, Depends(require_authentication)],
 ):
+    await validate_category_name(category.name)
     category = await add_category(name=category.name, creator_id=user_id)
 
     if not category:

@@ -1,10 +1,10 @@
 from collections.abc import Sequence
 
 from sqlalchemy import delete, func, select
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import SQLAlchemyError
 
 from main import db
-from main.commons.exceptions import BadRequest, ErrorCode, ErrorMessage, NotFound
+from main.commons.exceptions import BadRequest
 from main.models.category import CategoryModel
 from main.models.item import ItemModel
 
@@ -45,11 +45,8 @@ async def add_category(
     try:
         db.session.add(category)
         await db.session.commit()
-    except IntegrityError:
-        raise BadRequest(
-            error_message=ErrorMessage.CATEGORY_NAME_EXISTS,
-            error_code=ErrorCode.CATEGORY_NAME_EXISTS,
-        )
+    except SQLAlchemyError:
+        raise BadRequest()
 
     return category
 
@@ -60,10 +57,16 @@ async def get_category_by_id(id: int) -> CategoryModel | None:
     return result.scalar()
 
 
+async def get_category_by_name(name: str) -> CategoryModel | None:
+    statement = select(CategoryModel).where(CategoryModel.name == name)
+    result = await db.session.execute(statement)
+    return result.scalar()
+
+
 async def delete_category(id: int):
     statement = delete(CategoryModel).where(CategoryModel.id == id)
     try:
         await db.session.execute(statement)
         await db.session.commit()
-    except IntegrityError:
-        raise NotFound()
+    except SQLAlchemyError:
+        raise BadRequest()
