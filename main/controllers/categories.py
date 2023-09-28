@@ -2,7 +2,6 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from main.commons.exceptions import NotFound
 from main.engines.categories import (
     add_category,
     delete_category,
@@ -25,8 +24,7 @@ router: APIRouter = APIRouter()
     response_model=list[CategorySchema],
 )
 async def _get_categories():
-    categories = await get_categories()
-    return categories
+    return await get_categories()
 
 
 @router.post(
@@ -38,12 +36,7 @@ async def _add_category(
     user_id: Annotated[int, Depends(require_authentication)],
 ):
     await validate_category_name(category.name)
-    category = await add_category(name=category.name, creator_id=user_id)
-
-    if not category:
-        raise NotFound()
-
-    return category
+    return await add_category(name=category.name, creator_id=user_id)
 
 
 @router.get(
@@ -51,8 +44,7 @@ async def _add_category(
     response_model=CategorySchema,
 )
 async def _get_category(category_id: int):
-    category = await get_category_or_404(category_id)
-    return category
+    return await get_category_or_404(category_id)
 
 
 @router.delete(

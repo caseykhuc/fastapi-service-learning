@@ -1,11 +1,18 @@
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
+from sqlalchemy.exc import SQLAlchemyError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from main.libs.log import get_logger
 
-from .exceptions import BaseError, InternalServerError, StatusCode, ValidationError
+from .exceptions import (
+    BadRequest,
+    BaseError,
+    InternalServerError,
+    StatusCode,
+    ValidationError,
+)
 
 logger = get_logger(__name__)
 
@@ -49,6 +56,11 @@ def register_error_handlers(app: FastAPI):
             },
         )
         return error.to_response()
+
+    @app.exception_handler(SQLAlchemyError)
+    async def db_error_handler(_, e: SQLAlchemyError):
+        logger.exception(str(e))
+        return BadRequest()
 
     @app.exception_handler(Exception)
     async def handle_exception(_, e):

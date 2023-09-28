@@ -1,10 +1,8 @@
 from collections.abc import Sequence
 
 from sqlalchemy import delete, select
-from sqlalchemy.exc import SQLAlchemyError
 
 from main import db
-from main.commons.exceptions import BadRequest
 from main.models.category import CategoryModel
 
 
@@ -20,11 +18,8 @@ async def add_category(
 ) -> CategoryModel:
     category = CategoryModel(name=name, creator_id=creator_id)
 
-    try:
-        db.session.add(category)
-        await db.session.commit()
-    except SQLAlchemyError:
-        raise BadRequest()
+    db.session.add(category)
+    await db.session.commit()
 
     return category
 
@@ -43,8 +38,6 @@ async def get_category_by_name(name: str) -> CategoryModel | None:
 
 async def delete_category(id: int):
     statement = delete(CategoryModel).where(CategoryModel.id == id)
-    try:
-        await db.session.execute(statement)
-        await db.session.commit()
-    except SQLAlchemyError:
-        raise BadRequest()
+
+    await db.session.execute(statement)
+    await db.session.commit()
