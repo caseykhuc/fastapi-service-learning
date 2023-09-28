@@ -28,11 +28,11 @@ async def get_category_or_404(id: int) -> CategoryModel:
 
 async def require_category_creator(
     category_id: int,
-    id: Annotated[int, Depends(require_authentication)],
+    user_id: Annotated[int, Depends(require_authentication)],
 ):
     category = await get_category_or_404(category_id)
 
-    if category.creator_id != id:
+    if category.creator_id != user_id:
         raise Forbidden(
             error_message=ErrorMessage.NOT_CREATOR,
             error_code=ErrorCode.NOT_CREATOR,
