@@ -15,6 +15,7 @@ from main.utils.category import (
     require_category_creator,
     validate_category_name,
 )
+from main.utils.common import PositiveIntPath
 
 router: APIRouter = APIRouter()
 
@@ -43,7 +44,7 @@ async def _add_category(
     "/categories/{category_id}",
     response_model=CategorySchema,
 )
-async def _get_category(category_id: int):
+async def _get_category(category_id: PositiveIntPath):
     return await get_category_or_404(category_id)
 
 
@@ -53,7 +54,7 @@ async def _get_category(category_id: int):
     dependencies=[Depends(require_category_creator)],
 )
 async def _delete_category(
-    category_id: int,
+    category_id: PositiveIntPath,
 ):
     await delete_category(category_id)
 

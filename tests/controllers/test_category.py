@@ -62,11 +62,16 @@ class TestGetCategory:
 
         assert response.status_code == 404
 
+    @pytest.mark.parametrize(
+        "payload",
+        ["abc", -1, 0],
+    )
     async def test_unsuccessfully_validation_error(
         self,
         client,
+        payload,
     ):
-        response = await client.get("/categories/abc")
+        response = await client.get(f"/categories/{payload}")
 
         assert response.status_code == 400
 
@@ -120,7 +125,7 @@ class TestCreateCategory:
 
 
 class TestDeleteCategory:
-    async def test_delete_category_successfully(
+    async def test_successfully(
         self,
         client,
         access_token: str,
@@ -132,7 +137,7 @@ class TestDeleteCategory:
         )
         assert response.status_code == 200
 
-    async def test_delete_category_unsuccessfully_not_found(
+    async def test_unsuccessfully_not_found(
         self,
         client,
         access_token: str,
@@ -143,18 +148,23 @@ class TestDeleteCategory:
         )
         assert response.status_code == 404
 
-    async def test_delete_category_unsuccessfully_validation_error(
+    @pytest.mark.parametrize(
+        "payload",
+        ["abc", -1, 0],
+    )
+    async def test_unsuccessfully_validation_error(
         self,
         client,
         access_token,
+        payload,
     ):
         response = await client.delete(
-            "/categories/abc",
+            f"/categories/{payload}",
             headers={"Authorization": f"Bearer {access_token}"},
         )
         assert response.status_code == 400
 
-    async def test_delete_category_unsuccessfully_unauthorized(
+    async def test_unsuccessfully_unauthorized(
         self,
         client,
         category: CategoryModel,
@@ -164,7 +174,7 @@ class TestDeleteCategory:
         )
         assert response.status_code == 401
 
-    async def test_delete_category_unsuccessfully_not_creator(
+    async def test_unsuccessfully_not_creator(
         self,
         client,
         category: CategoryModel,

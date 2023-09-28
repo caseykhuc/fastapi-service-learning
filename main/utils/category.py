@@ -16,8 +16,10 @@ from main.engines.categories import (
 from main.models.category import CategoryModel
 from main.utils.auth import require_authentication
 
+from .common import PositiveIntPath
 
-async def get_category_or_404(id: int) -> CategoryModel:
+
+async def get_category_or_404(id: PositiveIntPath) -> CategoryModel:
     category = await get_category_by_id(id)
 
     if not category:
@@ -27,7 +29,7 @@ async def get_category_or_404(id: int) -> CategoryModel:
 
 
 async def require_category_creator(
-    category_id: int,
+    category_id: PositiveIntPath,
     user_id: Annotated[int, Depends(require_authentication)],
 ):
     category = await get_category_or_404(category_id)
