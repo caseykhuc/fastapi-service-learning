@@ -18,10 +18,6 @@ def prepare_category(user: UserModel):
     return add_category(name="Cat 1", creator_id=user.id)
 
 
-def get_access_token(client, user: UserModel):
-    return create_access_token_from_id(user.id)
-
-
 @pytest.fixture
 async def user():
     return await prepare_user(email=mock_email, password=mock_password)
@@ -33,19 +29,19 @@ async def category(user: UserModel):
 
 
 @pytest.fixture
-async def access_token(client, user: UserModel):
-    return await get_access_token(client=client, user=user)
+def access_token(user: UserModel):
+    return create_access_token_from_id(user.id)
 
 
 class TestGetCategories:
-    async def test_successfully(self, client, category):
+    async def test_successfully(self, client, category: CategoryModel):
         response = await client.get("/categories")
 
         assert response.status_code == 200
         categories = response.json()
 
         assert len(response.json()) == 1
-        assert categories[0]["name"] == "Cat 1"
+        assert categories[0]["name"] == category.name
 
 
 class TestGetCategory:
@@ -53,9 +49,9 @@ class TestGetCategory:
         response = await client.get(f"/categories/{category.id}")
 
         assert response.status_code == 200
-        category = response.json()
+        response_category = response.json()
 
-        assert category["name"] == "Cat 1"
+        assert response_category["name"] == category.name
 
     async def test_unsuccessfully_not_found(
         self,
@@ -174,7 +170,7 @@ class TestDeleteCategory:
         category: CategoryModel,
     ):
         user_2 = await prepare_user(email="email2@gmail.com", password=mock_password)
-        access_token_2 = await get_access_token(client, user=user_2)
+        access_token_2 = create_access_token_from_id(user_2.id)
 
         response = await client.delete(
             f"/categories/{category.id}",
