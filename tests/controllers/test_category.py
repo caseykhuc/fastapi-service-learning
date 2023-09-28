@@ -4,6 +4,7 @@ from main.engines.categories import add_category
 from main.engines.users import add_user
 from main.models.category import CategoryModel
 from main.models.user import UserModel
+from main.utils.auth import create_access_token_from_id
 
 mock_email = "email@gmail.com"
 mock_password = "random_string"
@@ -17,15 +18,8 @@ def prepare_category(user: UserModel):
     return add_category(name="Cat 1", creator_id=user.id)
 
 
-async def get_access_token(client, user: UserModel):
-    return (
-        (
-            await client.post(
-                "/login",
-                json={"email": user.email, "password": mock_password},
-            )
-        ).json()
-    )["access_token"]
+def get_access_token(client, user: UserModel):
+    return create_access_token_from_id(user.id)
 
 
 @pytest.fixture
