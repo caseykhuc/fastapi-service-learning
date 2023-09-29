@@ -9,7 +9,7 @@ from main.engines.items import (
     get_items,
     update_item,
 )
-from main.schemas.base import Empty, PositiveInt
+from main.schemas.base import Empty
 from main.schemas.item import (
     CategoryItemsSchema,
     ItemCreatePayloadSchema,
@@ -18,13 +18,13 @@ from main.schemas.item import (
 )
 from main.utils.auth import require_authentication
 from main.utils.category import get_category_or_404
-from main.utils.common import PositiveIntPath
+from main.utils.common import PositiveIntPath, PositiveIntQuery
 from main.utils.item import get_item_or_404, require_item_creator, validate_item_name
 
 router: APIRouter = APIRouter()
 
 
-DEFAULT_ITEMS_PER_PAGE = 25
+DEFAULT_ITEMS_PER_PAGE = 20
 
 
 @router.get(
@@ -34,8 +34,8 @@ DEFAULT_ITEMS_PER_PAGE = 25
 )
 async def _get_category_items(
     category_id: PositiveIntPath,
-    page: PositiveInt = 1,
-    number_per_page: PositiveInt = DEFAULT_ITEMS_PER_PAGE,
+    page: PositiveIntQuery = 1,
+    number_per_page: PositiveIntQuery = DEFAULT_ITEMS_PER_PAGE,
 ):
     items = await get_items(
         category_id,
