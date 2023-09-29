@@ -1,9 +1,16 @@
+from urllib import parse
+
 import pytest
 
 from main.models.category import CategoryModel
 from main.models.item import ItemModel
 from main.utils.auth import create_access_token_from_id
-from tests.helpers import generate_random_string, mock_password, prepare_user
+from tests.helpers import (
+    generate_random_string,
+    mock_password,
+    prepare_bulk_items,
+    prepare_user,
+)
 
 
 class TestGetCategoryItems:
@@ -16,6 +23,43 @@ class TestGetCategoryItems:
         assert data["total"] == 1
         assert len(data["items"]) == 1
         assert data["items"][0]["name"] == item.name
+
+    async def test_successfully_with_pagination(
+        self,
+        client,
+        user,
+        category: CategoryModel,
+    ):
+        total_items = 25
+        await prepare_bulk_items(
+            category_id=category.id,
+            creator_id=user.id,
+            count=total_items,
+        )
+
+        async def _test(
+            assert_len: int,
+            page: int | None = None,
+            number_per_page: int | None = None,
+        ):
+            query_config = {}
+            if page:
+                query_config["page"] = page
+            if number_per_page:
+                query_config["number_per_page"] = number_per_page
+            response = await client.get(
+                f"/categories/{category.id}/items?{parse.urlencode(query_config)}",
+            )
+            assert response.status_code == 200
+            data = response.json()
+
+            assert len(data["items"]) == assert_len
+            assert data["total"] == total_items
+
+        await _test(page=1, assert_len=20)
+        await _test(page=2, assert_len=5)
+        await _test(page=3, assert_len=0)
+        await _test(page=2, number_per_page=15, assert_len=10)
 
     async def test_unsuccessfully_not_found(
         self,
@@ -30,12 +74,26 @@ class TestGetCategoryItems:
         "payload",
         ["abc", -1, 0],
     )
-    async def test_unsuccessfully_validation_error(
+    async def test_unsuccessfully_path_validation_error(
         self,
         client,
         payload,
     ):
         response = await client.get(f"/categories/{payload}/items")
+
+        assert response.status_code == 400
+
+    @pytest.mark.parametrize(
+        "query",
+        ["page=0", "page=-1", "page=abc"],
+    )
+    async def test_unsuccessfully_query_validation_error(
+        self,
+        client,
+        query,
+        category: CategoryModel,
+    ):
+        response = await client.get(f"/categories/{category.id}/items?{query}")
 
         assert response.status_code == 400
 

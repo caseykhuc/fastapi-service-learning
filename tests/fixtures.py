@@ -25,7 +25,7 @@ async def category(user: UserModel):
 
 @pytest.fixture
 async def item(user: UserModel, category: CategoryModel):
-    return await prepare_item(category_id=category.id, user_id=user.id)
+    return await prepare_item(category_id=category.id, creator_id=user.id)
 
 
 @pytest.fixture
