@@ -19,8 +19,12 @@ class ErrorCode:
     ACCOUNT_ALREADY_REGISTERED = 400003
 
     UNAUTHORIZED = 401000
+
     FORBIDDEN = 403000
+    NOT_CREATOR = 403001
+
     NOT_FOUND = 404000
+
     METHOD_NOT_ALLOWED = 405000
     INTERNAL_SERVER_ERROR = 500000
 
@@ -108,4 +112,6 @@ class InternalServerError(BaseError):
 
 class ErrorMessage:
     ACCOUNT_ALREADY_REGISTERED = "Your email is already registered. Please log in."
+    CATEGORY_NAME_EXISTS = "Category name already exists."
+    NOT_CREATOR = "Only the creator can perform the action."
     INVALID_LOGIN_CREDENTIALS = "Your login information is incorrect. Please try again."
