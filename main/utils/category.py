@@ -19,8 +19,8 @@ from main.utils.auth import require_authentication
 from .common import PositiveIntPath
 
 
-async def get_category_or_404(id: PositiveIntPath) -> CategoryModel:
-    category = await get_category_by_id(id)
+async def get_category_or_404(category_id: PositiveIntPath) -> CategoryModel:
+    category = await get_category_by_id(category_id)
 
     if not category:
         raise NotFound()
