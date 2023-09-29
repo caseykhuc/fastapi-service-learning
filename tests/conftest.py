@@ -8,6 +8,8 @@ from main import app, config, db
 from main.libs.log import get_logger
 from main.models.base import BaseModel
 
+from .fixtures import access_token, category, item, user
+
 logger = get_logger(__name__)
 
 if config.ENVIRONMENT != "test":
@@ -50,3 +52,15 @@ async def database():
 async def client():
     async with AsyncClient(app=app, base_url="http://test") as client:
         yield client
+
+
+__all__ = [
+    "event_loop",
+    "recreate_database",
+    "database",
+    "client",
+    "user",
+    "category",
+    "item",
+    "access_token",
+]
