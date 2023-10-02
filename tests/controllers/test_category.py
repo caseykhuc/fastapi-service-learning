@@ -35,15 +35,15 @@ class TestGetCategory:
         assert response.status_code == 404
 
     @pytest.mark.parametrize(
-        "payload",
+        "category_id",
         ["abc", -1, 0],
     )
     async def test_unsuccessfully_validation_error(
         self,
         client,
-        payload,
+        category_id,
     ):
-        response = await client.get(f"/categories/{payload}")
+        response = await client.get(f"/categories/{category_id}")
 
         assert response.status_code == 400
 
@@ -126,17 +126,17 @@ class TestDeleteCategory:
         assert response.status_code == 404
 
     @pytest.mark.parametrize(
-        "payload",
+        "category_id",
         ["abc", -1, 0],
     )
     async def test_unsuccessfully_validation_error(
         self,
         client,
         access_token,
-        payload,
+        category_id,
     ):
         response = await client.delete(
-            f"/categories/{payload}",
+            f"/categories/{category_id}",
             headers={"Authorization": f"Bearer {access_token}"},
         )
         assert response.status_code == 400

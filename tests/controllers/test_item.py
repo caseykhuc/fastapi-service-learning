@@ -24,11 +24,23 @@ class TestGetCategoryItems:
         assert len(data["items"]) == 1
         assert data["items"][0]["name"] == item.name
 
+    @pytest.mark.parametrize(
+        "page,number_per_page,assert_len",
+        [
+            (1, None, 20),
+            (2, None, 5),
+            (3, None, 0),
+            (2, 15, 10),
+        ],
+    )
     async def test_successfully_with_pagination(
         self,
         client,
         user,
         category: CategoryModel,
+        assert_len: int,
+        page: int | None,
+        number_per_page: int | None,
     ):
         total_items = 25
         await prepare_bulk_items(
@@ -37,29 +49,19 @@ class TestGetCategoryItems:
             count=total_items,
         )
 
-        async def _test(
-            assert_len: int,
-            page: int | None = None,
-            number_per_page: int | None = None,
-        ):
-            query_config = {}
-            if page:
-                query_config["page"] = page
-            if number_per_page:
-                query_config["number_per_page"] = number_per_page
-            response = await client.get(
-                f"/categories/{category.id}/items?{parse.urlencode(query_config)}",
-            )
-            assert response.status_code == 200
-            data = response.json()
+        query_config = {}
+        if page:
+            query_config["page"] = page
+        if number_per_page:
+            query_config["number_per_page"] = number_per_page
+        response = await client.get(
+            f"/categories/{category.id}/items?{parse.urlencode(query_config)}",
+        )
+        assert response.status_code == 200
+        data = response.json()
 
-            assert len(data["items"]) == assert_len
-            assert data["total"] == total_items
-
-        await _test(page=1, assert_len=20)
-        await _test(page=2, assert_len=5)
-        await _test(page=3, assert_len=0)
-        await _test(page=2, number_per_page=15, assert_len=10)
+        assert len(data["items"]) == assert_len
+        assert data["total"] == total_items
 
     async def test_unsuccessfully_not_found(
         self,
@@ -71,15 +73,15 @@ class TestGetCategoryItems:
         assert response.status_code == 404
 
     @pytest.mark.parametrize(
-        "payload",
+        "category_id",
         ["abc", -1, 0],
     )
     async def test_unsuccessfully_path_validation_error(
         self,
         client,
-        payload,
+        category_id,
     ):
-        response = await client.get(f"/categories/{payload}/items")
+        response = await client.get(f"/categories/{category_id}/items")
 
         assert response.status_code == 400
 
@@ -98,7 +100,7 @@ class TestGetCategoryItems:
         assert response.status_code == 400
 
 
-class TestGetItemDetails:
+class TestGetItem:
     async def test_successfully(self, client, item: ItemModel):
         response = await client.get(f"/items/{item.id}")
 
@@ -113,15 +115,15 @@ class TestGetItemDetails:
         assert response.status_code == 404
 
     @pytest.mark.parametrize(
-        "payload",
+        "item_id",
         ["abc", -1, 0],
     )
     async def test_unsuccessfully_validation_error(
         self,
         client,
-        payload,
+        item_id,
     ):
-        response = await client.get(f"/items/{payload}")
+        response = await client.get(f"/items/{item_id}")
 
         assert response.status_code == 400
 
@@ -306,17 +308,17 @@ class TestDeleteItem:
         assert response.status_code == 404
 
     @pytest.mark.parametrize(
-        "payload",
+        "item_id",
         ["abc", -1, 0],
     )
     async def test_unsuccessfully_validation_error(
         self,
         client,
         access_token,
-        payload,
+        item_id,
     ):
         response = await client.delete(
-            f"/items/{payload}",
+            f"/items/{item_id}",
             headers={"Authorization": f"Bearer {access_token}"},
         )
         assert response.status_code == 400
