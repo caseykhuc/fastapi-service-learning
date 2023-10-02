@@ -19,8 +19,8 @@ from main.utils.auth import require_authentication
 from .common import PositiveIntPath
 
 
-async def get_category_or_404(id: PositiveIntPath) -> CategoryModel:
-    category = await get_category_by_id(id)
+async def get_category_from_request(category_id: PositiveIntPath) -> CategoryModel:
+    category = await get_category_by_id(category_id)
 
     if not category:
         raise NotFound()
@@ -28,12 +28,13 @@ async def get_category_or_404(id: PositiveIntPath) -> CategoryModel:
     return category
 
 
+RequestedCategory = Annotated[CategoryModel, Depends(get_category_from_request)]
+
+
 async def require_category_creator(
-    category_id: PositiveIntPath,
+    category: RequestedCategory,
     user_id: Annotated[int, Depends(require_authentication)],
 ):
-    category = await get_category_or_404(category_id)
-
     if category.creator_id != user_id:
         raise Forbidden(
             error_message=ErrorMessage.NOT_CREATOR,

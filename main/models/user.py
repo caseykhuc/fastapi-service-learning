@@ -1,10 +1,10 @@
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from .base import BaseModel
+from .base import BaseModel, TimestampMixin
 
 
-class UserModel(BaseModel):
+class UserModel(BaseModel, TimestampMixin):
     __tablename__ = "user"
 
     id: Mapped[int] = mapped_column(primary_key=True)
