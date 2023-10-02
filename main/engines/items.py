@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, desc, func, select
 
 from main import db
 from main.models.item import ItemModel
@@ -20,6 +20,7 @@ async def get_items(category_id: int, offset: int, limit: int) -> Sequence[ItemM
     statement = (
         select(ItemModel)
         .where(ItemModel.category_id == category_id)
+        .order_by(desc(ItemModel.created_at))
         .offset(offset)
         .limit(limit)
     )
