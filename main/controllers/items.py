@@ -89,6 +89,9 @@ async def _update_item(
     item_id: PositiveIntPath,
     item_data: ItemUpdatePayloadSchema,
 ):
+    if item_data.name:
+        await validate_item_name(item_data.name)
+
     await get_item_or_404(item_id)
     item = await update_item(item_id, **item_data.model_dump())
     return item
