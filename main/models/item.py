@@ -3,13 +3,13 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .base import BaseModel
+from .base import BaseModel, TimestampMixin
 
 if TYPE_CHECKING:
     from .category import CategoryModel
 
 
-class ItemModel(BaseModel):
+class ItemModel(BaseModel, TimestampMixin):
     __tablename__ = "item"
 
     id: Mapped[int] = mapped_column(primary_key=True)
