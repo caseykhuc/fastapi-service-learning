@@ -19,8 +19,8 @@ from main.utils.auth import require_authentication
 from .common import PositiveIntPath
 
 
-async def get_item_or_404(id: PositiveIntPath) -> ItemModel:
-    item = await get_item_by_id(id)
+async def get_item_from_request(item_id: PositiveIntPath) -> ItemModel:
+    item = await get_item_by_id(item_id)
 
     if not item:
         raise NotFound()
@@ -29,11 +29,9 @@ async def get_item_or_404(id: PositiveIntPath) -> ItemModel:
 
 
 async def require_item_creator(
-    item_id: PositiveIntPath,
+    item: Annotated[ItemModel, Depends(get_item_from_request)],
     user_id: Annotated[int, Depends(require_authentication)],
 ):
-    item = await get_item_or_404(item_id)
-
     if item.creator_id != user_id:
         raise Forbidden(
             error_message=ErrorMessage.NOT_CREATOR,

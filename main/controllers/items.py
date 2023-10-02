@@ -9,6 +9,7 @@ from main.engines.items import (
     get_items,
     update_item,
 )
+from main.models.item import ItemModel
 from main.schemas.base import Empty
 from main.schemas.item import (
     CategoryItemsSchema,
@@ -17,9 +18,13 @@ from main.schemas.item import (
     ItemUpdatePayloadSchema,
 )
 from main.utils.auth import require_authentication
-from main.utils.category import get_category_or_404
+from main.utils.category import get_category_from_request
 from main.utils.common import PositiveIntPath, PositiveIntQuery
-from main.utils.item import get_item_or_404, require_item_creator, validate_item_name
+from main.utils.item import (
+    get_item_from_request,
+    require_item_creator,
+    validate_item_name,
+)
 
 router: APIRouter = APIRouter()
 
@@ -30,7 +35,7 @@ DEFAULT_ITEMS_PER_PAGE = 20
 @router.get(
     "/categories/{category_id}/items",
     response_model=CategoryItemsSchema,
-    dependencies=[Depends(get_category_or_404)],
+    dependencies=[Depends(get_category_from_request)],
 )
 async def _get_category_items(
     category_id: PositiveIntPath,
@@ -55,7 +60,7 @@ async def _get_category_items(
 @router.post(
     "/categories/{category_id}/items",
     response_model=ItemSchema,
-    dependencies=[Depends(get_category_or_404)],
+    dependencies=[Depends(get_category_from_request)],
 )
 async def _add_category_items(
     category_id: PositiveIntPath,
@@ -75,9 +80,9 @@ async def _add_category_items(
 
 @router.get("/items/{item_id}", response_model=ItemSchema)
 async def _get_item(
-    item_id: PositiveIntPath,
+    item: Annotated[ItemModel, Depends(get_item_from_request)],
 ):
-    return await get_item_or_404(item_id)
+    return item
 
 
 @router.put(
@@ -86,15 +91,14 @@ async def _get_item(
     dependencies=[Depends(require_item_creator)],
 )
 async def _update_item(
-    item_id: PositiveIntPath,
+    item: Annotated[ItemModel, Depends(get_item_from_request)],
     item_data: ItemUpdatePayloadSchema,
 ):
     if item_data.name:
         await validate_item_name(item_data.name)
 
-    await get_item_or_404(item_id)
-    item = await update_item(item_id, **item_data.model_dump())
-    return item
+    updated_item = await update_item(item.id, **item_data.model_dump())
+    return updated_item
 
 
 @router.delete(

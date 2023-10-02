@@ -7,11 +7,12 @@ from main.engines.categories import (
     delete_category,
     get_categories,
 )
+from main.models.category import CategoryModel
 from main.schemas.base import Empty
 from main.schemas.category import CategoryCreatePayloadSchema, CategorySchema
 from main.utils.auth import require_authentication
 from main.utils.category import (
-    get_category_or_404,
+    get_category_from_request,
     require_category_creator,
     validate_category_name,
 )
@@ -44,8 +45,10 @@ async def _add_category(
     "/categories/{category_id}",
     response_model=CategorySchema,
 )
-async def _get_category(category_id: PositiveIntPath):
-    return await get_category_or_404(category_id)
+async def _get_category(
+    category: Annotated[CategoryModel, Depends(get_category_from_request)],
+):
+    return category
 
 
 @router.delete(
