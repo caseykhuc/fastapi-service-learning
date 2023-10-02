@@ -31,7 +31,7 @@ class PlainItemSchema(BaseResponseSchema):
     description: LongStr
 
 
-class ItemSchema(PlainItemSchema, BaseResponseSchema):
+class ItemSchema(PlainItemSchema):
     category_id: int
 
 
