@@ -9,7 +9,6 @@ from main.engines.items import (
     get_items,
     update_item,
 )
-from main.models.item import ItemModel
 from main.schemas.base import Empty
 from main.schemas.item import (
     CategoryItemsSchema,
@@ -21,7 +20,7 @@ from main.utils.auth import require_authentication
 from main.utils.category import get_category_from_request
 from main.utils.common import PositiveIntPath, PositiveIntQuery
 from main.utils.item import (
-    get_item_from_request,
+    RequestedItem,
     require_item_creator,
     validate_item_name,
 )
@@ -80,7 +79,7 @@ async def _add_category_items(
 
 @router.get("/items/{item_id}", response_model=ItemSchema)
 async def _get_item(
-    item: Annotated[ItemModel, Depends(get_item_from_request)],
+    item: RequestedItem,
 ):
     return item
 
@@ -91,7 +90,7 @@ async def _get_item(
     dependencies=[Depends(require_item_creator)],
 )
 async def _update_item(
-    item: Annotated[ItemModel, Depends(get_item_from_request)],
+    item: RequestedItem,
     item_data: ItemUpdatePayloadSchema,
 ):
     if item_data.name:

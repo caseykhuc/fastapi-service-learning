@@ -28,8 +28,11 @@ async def get_category_from_request(category_id: PositiveIntPath) -> CategoryMod
     return category
 
 
+RequestedCategory = Annotated[CategoryModel, Depends(get_category_from_request)]
+
+
 async def require_category_creator(
-    category: Annotated[CategoryModel, Depends(get_category_from_request)],
+    category: RequestedCategory,
     user_id: Annotated[int, Depends(require_authentication)],
 ):
     if category.creator_id != user_id:

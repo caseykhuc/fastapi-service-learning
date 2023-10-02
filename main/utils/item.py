@@ -28,8 +28,11 @@ async def get_item_from_request(item_id: PositiveIntPath) -> ItemModel:
     return item
 
 
+RequestedItem = Annotated[ItemModel, Depends(get_item_from_request)]
+
+
 async def require_item_creator(
-    item: Annotated[ItemModel, Depends(get_item_from_request)],
+    item: RequestedItem,
     user_id: Annotated[int, Depends(require_authentication)],
 ):
     if item.creator_id != user_id:
