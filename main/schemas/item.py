@@ -19,7 +19,7 @@ class ItemUpdatePayloadSchema(BaseValidationSchema):
     description: LongStr | None = None
 
     @model_validator(mode="after")
-    def check_passwords_match(self) -> "ItemUpdatePayloadSchema":
+    def check_not_empty(self) -> "ItemUpdatePayloadSchema":
         if self.name is None and self.description is None:
             raise ValueError("There is no data to update.")
         return self
