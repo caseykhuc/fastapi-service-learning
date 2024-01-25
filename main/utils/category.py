@@ -14,6 +14,7 @@ from main.engines.categories import (
     get_category_by_name,
 )
 from main.models.category import CategoryModel
+from main.schemas.category import CategorySchema
 from main.utils.auth import require_authentication
 
 from .common import PositiveIntPath
@@ -50,3 +51,10 @@ async def validate_category_name(name: str):
             error_message=ErrorMessage.CATEGORY_NAME_EXISTS,
             error_code=ErrorCode.CATEGORY_NAME_EXISTS,
         )
+
+
+def get_category_schema(category: CategoryModel, user_id: int | None):
+    return CategorySchema(
+        **category.__dict__,
+        is_creator=category.creator_id == user_id,
+    )

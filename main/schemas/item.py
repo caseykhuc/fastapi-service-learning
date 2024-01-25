@@ -29,7 +29,7 @@ class PlainItemSchema(BaseResponseSchema):
     id: int
     name: ShortStr
     description: LongStr
-    creator_id: int
+    is_creator: bool
 
 
 class ItemSchema(PlainItemSchema):

@@ -9,9 +9,10 @@ from main.engines.categories import (
 )
 from main.schemas.base import Empty
 from main.schemas.category import CategoryCreatePayloadSchema, CategorySchema
-from main.utils.auth import require_authentication
+from main.utils.auth import RequestedUserId, require_authentication
 from main.utils.category import (
     RequestedCategory,
+    get_category_schema,
     require_category_creator,
     validate_category_name,
 )
@@ -24,8 +25,10 @@ router: APIRouter = APIRouter()
     "/categories",
     response_model=list[CategorySchema],
 )
-async def _get_categories():
-    return await get_categories()
+async def _get_categories(user_id: RequestedUserId):
+    return [
+        get_category_schema(category, user_id) for category in await get_categories()
+    ]
 
 
 @router.post(
@@ -37,17 +40,18 @@ async def _add_category(
     user_id: Annotated[int, Depends(require_authentication)],
 ):
     await validate_category_name(category.name)
-    return await add_category(name=category.name, creator_id=user_id)
+    return get_category_schema(
+        await add_category(**category.__dict__, creator_id=user_id),
+        user_id,
+    )
 
 
 @router.get(
     "/categories/{category_id}",
     response_model=CategorySchema,
 )
-async def _get_category(
-    category: RequestedCategory,
-):
-    return category
+async def _get_category(category: RequestedCategory, user_id: RequestedUserId):
+    return get_category_schema(category, user_id)
 
 
 @router.delete(

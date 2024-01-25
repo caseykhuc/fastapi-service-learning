@@ -14,9 +14,10 @@ async def get_categories() -> Sequence[CategoryModel]:
 
 async def add_category(
     name: str,
+    description: str,
     creator_id: int,
 ) -> CategoryModel:
-    category = CategoryModel(name=name, creator_id=creator_id)
+    category = CategoryModel(name=name, description=description, creator_id=creator_id)
 
     db.session.add(category)
     await db.session.commit()

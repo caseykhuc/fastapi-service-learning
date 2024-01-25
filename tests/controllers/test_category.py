@@ -52,7 +52,10 @@ class TestCreateCategory:
     async def test_successfully(self, client, access_token: str):
         response = await client.post(
             "/categories",
-            json={"name": generate_random_string(255)},
+            json={
+                "name": generate_random_string(255),
+                "description": generate_random_string(5000),
+            },
             headers={"Authorization": f"Bearer {access_token}"},
         )
         assert response.status_code == 200
@@ -60,7 +63,7 @@ class TestCreateCategory:
     async def test_unsuccessfully_unauthorized(self, client):
         response = await client.post(
             "/categories",
-            json={"name": "New category"},
+            json={"name": "New category", "description": "New description"},
         )
         assert response.status_code == 401
 
@@ -94,7 +97,7 @@ class TestCreateCategory:
     ):
         response = await client.post(
             "/categories",
-            json={"name": category.name},
+            json={"name": category.name, "description": "New description"},
             headers={"Authorization": f"Bearer {access_token}"},
         )
         assert response.status_code == 400

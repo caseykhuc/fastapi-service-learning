@@ -15,7 +15,11 @@ def prepare_user(email: str = mock_email, password: str = mock_password):
 
 
 def prepare_category(creator_id: int):
-    return add_category(name="Cat 1", creator_id=creator_id)
+    return add_category(
+        name="Cat 1",
+        description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do",
+        creator_id=creator_id,
+    )
 
 
 def prepare_item(category_id: int, creator_id: int):

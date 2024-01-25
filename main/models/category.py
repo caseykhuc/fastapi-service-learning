@@ -14,6 +14,7 @@ class CategoryModel(BaseModel, TimestampMixin):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(255), unique=True)
+    description: Mapped[str] = mapped_column(String(5000))
     creator_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     items: Mapped[list["ItemModel"]] = relationship(
         back_populates="category",

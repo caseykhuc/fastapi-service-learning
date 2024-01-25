@@ -3,7 +3,7 @@ version: '3'
 services:
   mysql_dev:
     image: mysql:5.7
-    container_name: mysql_dev
+    container_name: fastapi_mysql_dev
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_DEV_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DEV_DATABASE}
@@ -14,7 +14,7 @@ services:
 
   adminer:
     image: adminer
-    container_name: adminer
+    container_name: fastapi_adminer
     ports:
       - "${ADMINER_PORT}:8080"
 

@@ -36,6 +36,22 @@ def get_id_from_access_token(token: str) -> int | None:
         return None
 
 
+async def get_user_id_from_request(
+    token: Annotated[
+        HTTPAuthorizationCredentials,
+        Depends(HTTPBearer(auto_error=False)),
+    ],
+) -> int | None:
+    if not token:
+        return None
+
+    user_id = get_id_from_access_token(token.credentials)
+    if not user_id:
+        return None
+
+    return user_id
+
+
 async def require_authentication(
     token: Annotated[
         HTTPAuthorizationCredentials,
@@ -50,3 +66,6 @@ async def require_authentication(
         raise Unauthorized()
 
     return user_id
+
+
+RequestedUserId = Annotated[int, Depends(get_user_id_from_request)]
